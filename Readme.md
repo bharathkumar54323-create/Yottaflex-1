@@ -1,121 +1,398 @@
-CohortGuard — 3-Tier Course Participation, Assessment Progress & Completion System
 
-An end-to-end, 100% offline 3-Tier Analytics & Reconciliation Platform built to analyze learner cohort participation, content usage, assessment progress, and rule-based course completion while exposing edge-case exceptions and preserving full audit traceability.
+# CohortGuard – 3-Tier Course Participation, Assessment Progress & Completion System
 
-1. System Requirements & Programming Versions
+An end-to-end, 100% offline 3-Tier Analytics and Reconciliation Platform designed to analyze learner cohort participation, content usage, assessment progress, and rule-based course completion.
 
-Operating System: Windows 10 / 11 (64-bit)
+CohortGuard identifies data inconsistencies, handles edge cases, quarantines invalid activity records, and maintains complete audit traceability.
 
-Python Version: Python 3.10 – 3.13 (64-bit)
+---
 
-Tier 1 (Frontend): HTML5, CSS3, Vanilla ES6+ JavaScript, HTML5 <canvas> (zero external CDNs)
+## 1. Project Overview
 
-Tier 2 (Backend / Rule Engine): FastAPI >=0.115.0, Uvicorn >=0.30.0, SQLAlchemy >=2.0.35, Pydantic >=2.9.0
+CohortGuard provides an analytics platform for monitoring learner participation and course completion across multiple cohorts.
 
-Tier 3 (Database & Seed Engine): Built-in SQLite 3 (zero-credential local database) + NumPy >=2.1.0 (default_rng(20261022))
+The platform follows a 3-tier architecture:
 
-Testing & Validation: Pytest >=8.3.0, HTTPX >=0.27.0
+- **Tier 1 – Frontend:** Interactive dashboard built using HTML5, CSS3, and Vanilla JavaScript.
+- **Tier 2 – Backend:** FastAPI REST API with SQLAlchemy and a rule-based completion engine.
+- **Tier 3 – Database:** SQLite relational database with synthetic data generation, audit history, and reconciliation.
 
-2. Project Folder Structure
+### Key Features
 
+- Learner participation and engagement analytics.
+- Course and cohort performance monitoring.
+- Content consumption tracking.
+- Assessment progress and completion monitoring.
+- Rule-based course completion validation.
+- Duplicate activity event detection.
+- Invalid activity quarantine.
+- Append-only enrollment state history.
+- Deterministic synthetic dataset generation.
+- SHA-256 dataset reproducibility validation.
+- Fully offline execution without external CDNs or cloud dependencies.
+
+---
+
+## 2. System Architecture
+
+```text
+                TIER 1 – PRESENTATION
+        ┌────────────────────────────────┐
+        │       HTML5 + CSS3 + JS        │
+        │                                │
+        │       Interactive Dashboard   │
+        │       Actor Switcher          │
+        │       Analytics & Charts      │
+        └───────────────┬────────────────┘
+                        │
+                  HTTP REST API
+                        │
+                        ▼
+                TIER 2 – APPLICATION
+        ┌────────────────────────────────┐
+        │            FastAPI             │
+        │                                │
+        │       API Endpoints            │
+        │       Business Rule Engine     │
+        │       Data Validation          │
+        │       Reconciliation           │
+        │       Audit Processing         │
+        └───────────────┬────────────────┘
+                        │
+                   SQLAlchemy
+                        │
+                        ▼
+                TIER 3 – DATABASE
+        ┌────────────────────────────────┐
+        │           SQLite               │
+        │                                │
+        │       10 Core Entities         │
+        │       Enrollment History       │
+        │       Activity Events          │
+        │       Assessment Records       │
+        │       Quarantine Audit Log     │
+        └────────────────────────────────┘
+```
+
+---
+
+## 3. Technology Stack
+
+| Component | Technology |
+|---|---|
+| Frontend | HTML5, CSS3, JavaScript ES6+ |
+| Visualization | HTML5 Canvas |
+| Backend | Python, FastAPI |
+| API Server | Uvicorn |
+| ORM | SQLAlchemy 2.x |
+| Validation | Pydantic 2.x |
+| Database | SQLite 3 |
+| Synthetic Data | NumPy |
+| Testing | Pytest, HTTPX |
+| Integrity | SHA-256 |
+
+### System Requirements
+
+- Windows 10 / Windows 11 (64-bit)
+- Python 3.10–3.13 (64-bit)
+- No external database server required.
+- No internet connection required after dependency installation.
+
+---
+
+## 4. Project Folder Structure
+
+```text
 Yottaflex.ai-hackation/
+│
 ├── frontend/
-│   └── index.html               # Tier 1: Self-contained offline UI (HTML5 + CSS3 + Vanilla JS)
+│   └── index.html
 │
 ├── backend/
-│   ├── __init__.py              # Package marker
-│   ├── main.py                  # Tier 2: FastAPI REST API, auto-DB bootstrap & rule engine
-│   └── load_db.py               # Optional standalone CSV -> SQLite loader
+│   ├── __init__.py
+│   ├── main.py
+│   └── load_db.py
 │
 ├── database/
-│   ├── __init__.py              # Package marker
-│   ├── schema.sql               # Tier 3: 10-entity DDL + append-only history + quarantine log
-│   ├── generate_dataset.py      # Deterministic seed=20261022 generator (starter & full)
-│   ├── data_dictionary.md       # Step 1: Field-level schema, enums, units & validation rules
-│   └── cohort_analytics.db      # Auto-generated zero-credential SQLite database
+│   ├── __init__.py
+│   ├── schema.sql
+│   ├── generate_dataset.py
+│   └── data_dictionary.md
 │
 ├── tests/
-│   └── test_validation.py       # Step 8 & 10: 8-gate integrity suite & SHA-256 reproducibility
+│   └── test_validation.py
 │
-├── data_starter/                # Generated 1% starter CSVs + ground_truth.csv + source_manifest.json
-├── data_full/                   # Generated 2.0M-event full CSVs + ground_truth.csv + manifest
-├── requirements.txt             # Python dependencies (100% pre-built Windows wheels)
-└── README.md                    # Setup, architecture & runbook
+├── data_starter/
+│   ├── CSV datasets
+│   ├── ground_truth.csv
+│   └── source_manifest.json
+│
+├── data_full/
+│   ├── CSV datasets
+│   ├── ground_truth.csv
+│   └── source_manifest.json
+│
+├── requirements.txt
+├── README.md
+└── database/cohort_analytics.db
+```
 
+---
 
-3. Step-by-Step Setup & Run Instructions (Windows PowerShell)
+## 5. Synthetic Dataset Generation
 
-Step 1 — Create & Activate Virtual Environment (yottaflex)
+CohortGuard uses a deterministic synthetic dataset generator powered by NumPy.
 
+**Random Seed:** `20261022`
+
+### Full Dataset Statistics
+
+| Entity | Records |
+|---|---:|
+| Learners | 20,000 |
+| Courses | 500 |
+| Enrollments | 100,000 |
+| Activity Events | 2,000,000 |
+
+Two dataset configurations are supported:
+
+- **Starter:** 1% dataset for quick development and testing.
+- **Full:** Complete dataset for large-scale analytics and reconciliation.
+
+### Generate Starter Dataset
+
+```powershell
+python database/generate_dataset.py --seed 20261022 --scale starter --out .\data_starter
+```
+
+### Generate Full Dataset
+
+```powershell
+python database/generate_dataset.py --seed 20261022 --scale full --out .\data_full
+```
+
+---
+
+## 6. Core Actors
+
+The application supports five different actors through the dashboard actor switcher.
+
+1. **Academic Admin:** Monitors overall academic performance and completion.
+2. **Learner:** Tracks personal course participation and assessment progress.
+3. **Support Staff:** Investigates enrollment and activity exceptions.
+4. **Instructor:** Monitors learner engagement and assessment performance.
+5. **Platform Admin:** Monitors system integrity, reconciliation, and audit records.
+
+---
+
+## 7. Core Entities
+
+The platform maintains 10 core entity categories:
+
+| Entity | Description |
+|---|---|
+| LRN | Learner information |
+| CRS | Course information |
+| ENR | Learner enrollment |
+| CNT | Course content |
+| EVT | Learner activity events |
+| ASM | Assessment information |
+| ATT | Assessment attempts |
+| RUL | Completion rules |
+| COH | Cohort information |
+| OUT | Completion outcomes |
+
+The relational structure maintains data lineage across learners, courses, enrollments, events, assessments, and completion outcomes.
+
+---
+
+## 8. Edge Cases & Reconciliation
+
+CohortGuard addresses four important data integrity scenarios.
+
+### 1. Duplicate Events Inflate Engagement
+
+**Problem:** Mobile applications may retry event synchronization, creating duplicate activity records.
+
+**Solution:** Deduplicate events using `client_event_uuid` and retain the canonical event using:
+
+```sql
+ROW_NUMBER() OVER (
+    PARTITION BY client_event_uuid
+    ORDER BY event_timestamp_utc
+)
+```
+
+### 2. Activity From Unenrolled Learners
+
+**Problem:** Activity may be generated by learners who are not enrolled or have already withdrawn.
+
+**Solution:** Invalid activity records are isolated in `quarantine_audit_log`.
+
+### 3. Completion Before Required Assessment
+
+**Problem:** A learner may claim course completion without satisfying mandatory assessment requirements.
+
+**Solution:** The completion rule engine validates assessment requirements before accepting completion.
+
+### 4. Timezone Shifts Misassign Days
+
+**Problem:** Different client timezones can cause incorrect daily and weekly activity reporting.
+
+**Solution:** Client timestamps are normalized to canonical UTC ISO-8601 timestamps before aggregation.
+
+Weekly grouping:
+
+```sql
+strftime('%Y-W%W', event_timestamp_utc)
+```
+
+---
+
+## 9. Installation & Setup (Windows PowerShell)
+
+### Step 1 – Clone the Repository
+
+```powershell
+git clone <YOUR_REPOSITORY_URL>
+cd Yottaflex.ai-hackation
+```
+
+### Step 2 – Create Virtual Environment
+
+```powershell
 python -m venv yottaflex
+```
+
+### Step 3 – Activate Environment
+
+```powershell
 .\yottaflex\Scripts\Activate.ps1
+```
 
+If PowerShell blocks activation:
 
-(If PowerShell blocks script activation, run Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process first.)
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+```
 
-Step 2 — Install Dependencies (Pre-Built Windows Wheels)
+### Step 4 – Install Dependencies
 
-.\yottaflex\Scripts\python.exe -m pip install --upgrade pip
-.\yottaflex\Scripts\python.exe -m pip install --only-binary :all: -r requirements.txt
+```powershell
+python -m pip install --upgrade pip
+```
 
+```powershell
+python -m pip install --only-binary :all: -r requirements.txt
+```
 
-Step 3 — Create Package Markers (One-Time)
+### Step 5 – Create Package Markers
 
+```powershell
 New-Item -ItemType File -Path backend\__init__.py, database\__init__.py -Force
+```
 
+### Step 6 – Generate Starter Dataset
 
-Step 4 — Generate Deterministic Synthetic Datasets (seed = 20261022)
+```powershell
+python database\generate_dataset.py --seed 20261022 --scale starter --out .\data_starter
+```
 
-Starter Scale (1% volume — fast local testing):
+### Step 7 – Run Validation Tests
 
-.\yottaflex\Scripts\python.exe database\generate_dataset.py --seed 20261022 --scale starter --out .\data_starter
+```powershell
+python -m pytest -v tests\test_validation.py
+```
 
+### Step 8 – Start the Application
 
-Full Scale (20,000 learners, 500 courses, 100,000 enrollments, 2,000,000 activity events):
+```powershell
+python -m uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
+```
 
-.\yottaflex\Scripts\python.exe database\generate_dataset.py --seed 20261022 --scale full --out .\data_full
+The backend automatically initializes the SQLite database and loads the starter dataset on first startup.
 
+---
 
-Step 5 — Run 8-Gate Validation & Step 10 Reproducibility Tests
+## 10. Access the Application
 
-.\yottaflex\Scripts\python.exe -m pytest -v tests\test_validation.py
+After starting the backend, access the following local URLs:
 
+| Service | URL |
+|---|---|
+| Interactive Dashboard | http://127.0.0.1:8000 |
+| FastAPI Swagger Docs | http://127.0.0.1:8000/docs |
+| Health Check | http://127.0.0.1:8000/api/v1/health |
 
-Verifies primary-key uniqueness, foreign-key integrity, allowed enums, zero ground_truth.csv leakage, duplicate event detection, and bit-for-bit identical SHA-256 checksums across two independent runs with seed 20261022.
+All application services run locally.
 
-Step 6 — Start the 3-Tier Application
+---
 
-.\yottaflex\Scripts\python.exe -m uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
+## 11. Loading the Full Dataset
 
+To load the complete 2-million-event dataset into SQLite:
 
-On first startup, backend/main.py automatically creates database/cohort_analytics.db from database/schema.sql, loads data_starter/, and populates quarantine_audit_log.
+```powershell
+python backend\load_db.py --data-dir .\data_full
+```
 
-(To load the full 2M-event dataset into SQLite manually: .\yottaflex\Scripts\python.exe backend\load_db.py --data-dir .\data_full)
+**Note:** The full dataset requires additional disk space, memory, and processing time compared with the starter dataset.
 
-Step 7 — Open the Application
+---
 
-Tier 1 Interactive Dashboard: http://127.0.0.1:8000
+## 12. Testing & Validation
 
-Tier 2 FastAPI Swagger Docs: http://127.0.0.1:8000/docs
+CohortGuard includes an automated integrity validation suite.
 
-Health Check JSON: http://127.0.0.1:8000/api/v1/health
+Run:
 
-4. Core Entities, Actors & Edge Cases Covered
+```powershell
+python -m pytest -v tests\test_validation.py
+```
 
-5 Primary Actors: Academic Admin, Learner, Support Staff, Instructor, and Platform Admin (selectable in the top-right Actor switcher).
+### Validation Coverage
 
-10 Core Entities (LRN-*, CRS-*, ENR-*, CNT-*, EVT-*, ASM-2026-*, ATT-*, RUL-*, COH-*, OUT-*): Full relational lineage with enrollment_state_history preserving append-only state transitions.
+- Primary key uniqueness.
+- Foreign key integrity.
+- Allowed enumeration values.
+- Ground-truth leakage prevention.
+- Duplicate event detection.
+- Dataset consistency.
+- Deterministic generation.
+- SHA-256 reproducibility across independent runs.
 
-4 Required Edge Cases (Isolated in ground_truth.csv):
+The validation process helps ensure that generated datasets remain consistent and reproducible.
 
-Duplicate Events Inflate Engagement: Mobile offline sync retries deduplicated via client_event_uuid (ROW_NUMBER() = 1).
+---
 
-Activity From Unenrolled Learner: Orphan or post-withdrawal events quarantined into quarantine_audit_log.
+## 13. Data Provenance & Security
 
-Completion Before Required Assessment: Premature COMPLETED claims blocked by CompletionRule checks.
+- All datasets are synthetically generated.
+- No external learner PII is used.
+- No third-party restricted datasets are required.
+- Fixed random seed ensures reproducibility.
+- SQLite operates locally without database credentials.
+- No external CDN dependencies.
+- Audit history supports traceability of enrollment state changes.
+- Invalid records are preserved separately for investigation.
 
-Timezone Shifts Misassign Days: Local client offsets normalized to canonical UTC ISO-8601 week boundaries (strftime('%Y-W%W', event_timestamp_utc)).
+---
 
-5. Data Provenance & Lawful Use
+## 14. Future Enhancements
 
-100% synthetic dataset generated deterministically from fixed seed 20261022 with zero external PII or third-party restricted data.
+- Advanced cohort-level predictive analytics.
+- Learner dropout risk identification.
+- Assessment performance forecasting.
+- More granular audit reporting.
+- Role-based authentication and authorization.
+- Large-scale database performance optimization.
+
+---
+
+## 15. Project Summary
+
+CohortGuard demonstrates an end-to-end 3-tier analytics architecture combining frontend visualization, backend business rules, relational database management, deterministic synthetic data generation, and automated data integrity validation.
+
+The system focuses on reliable learner participation analytics, accurate course completion decisions, transparent exception handling, and complete audit traceability.
+
+**Built with Python, FastAPI, SQLite, SQLAlchemy, NumPy, HTML5, CSS3, and JavaScript.**
