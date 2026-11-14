@@ -1,0 +1,11 @@
+﻿yottaflex/
+Include/
+Lib/
+Scripts/
+pyvenv.cfg
+__pycache__/
+.pytest_cache/
+data_starter/
+data_full/
+database/*.db
+.env
